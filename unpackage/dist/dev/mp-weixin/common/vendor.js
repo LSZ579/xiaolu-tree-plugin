@@ -9005,6 +9005,16 @@ __webpack_require__.r(__webpack_exports__);
       nodePathArray: [] };
 
   },
+  /*
+     	*	已兼容h5和小程序端,其它端没测试过，估计问题不大，只需要改一下传值的方式
+     	* 
+     	*	如有问题可以加qq：122720267
+     	* 	
+     	*	使用该插件的朋友请给个好评，或者到git start一下
+     	*   git地址：https://github.com/LSZ579/xiaolu-tree-plugin.git
+     	*   插件市场地址： https://ext.dcloud.net.cn/plugin?id=2423
+     	* 
+     */
   components: {
     search: search },
 
