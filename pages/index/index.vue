@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="children">
-			<view v-for="(item,index) in query" style="margin: 2px;display: inline-block;" :key="index">
+			<view v-for="(item,index) in selectListItem" style="margin: 2px;display: inline-block;" :key="index">
 				<text >{{item.name}};</text>
 			</view>
 		</view>
@@ -12,10 +12,10 @@
 			</view>
 		</view>
 		
-		<button class="btn" @click="toChoose(query,0)" type="primary">多选模式（选择任意一项）</button>
-		<button  class="btn" @click="toChoose(query,1)" type="primary">多选模式（关联下级）</button>
-		<button class="btn" @click="toChoose(query,2)" type="primary">单选模式(任意一项)</button>
-		<button class="btn" @click="toChoose(query,3)" type="primary">单选（只选user）</button>
+		<button class="btn" @click="toChoose(aprop)" type="primary">多选模式（选择任意一项）</button>
+		<button  class="btn" @click="toChoose(bprop)" type="primary">多选模式（关联下级）</button>
+		<button class="btn" @click="toChoose(cprop)" type="primary">单选模式(任意一项)</button>
+		<button class="btn" @click="toChoose(dprop)" type="primary">单选（只选user）</button>
 		<button class="btn" @click="clear()" type="default">清空选择</button>
 	</view>
 	
@@ -36,40 +36,54 @@
 	export default {
 		data() {
 			return {
-				query:[],
+				selectListItem:[],
 				parent_list: [],
-				detail:{
-					userIds:[],
-					organizeIds:[]
+
+				isChoose:[],
+				aprop: {
+					label: 'name',
+					children: 'children',
+					multiple:true
 				},
-				sendObj:[],
-				uoData:[],
-				isChoose:[]
+				bprop: {
+					label: 'name',
+					children: 'children',
+					multiple:true,
+					checkStrictly:true
+				},
+				cprop: {//单选模式(任意一项)
+					label: 'name',
+					children: 'children',
+					multiple:false,
+					nodes:false
+				},
+				dprop: {//单选模式选user
+					label: 'name',
+					children: 'children',
+					multiple:false,
+					nodes:true
+				}
 			}
 		},
-		onShow() {
-			//兼容小程序,获取选中的值
-			//#ifdef MP-WEIXIN||MP-QQ
-				let pages = getCurrentPages();
-				let currPage = pages[pages.length - 1];
-				this.query = currPage.data.query;
-			  // #endif
+		created() {
+			uni.$on('selectSuccess',(data)=>{
+				this.$set(this,'selectListItem',[...data.list])
+			})
 		},
 		methods: {
-			toChoose(item,type){
+			toChoose(prop){
 				// #ifdef H5
-					let items = encodeURIComponent(JSON.stringify(this.query));
+					let items = encodeURIComponent(JSON.stringify(this.selectListItem));
 				// #endif
 				// #ifdef MP-QQ||MP-WEIXIN
-					let items = JSON.stringify(this.query);
+					let items = JSON.stringify(this.selectListItem);
 				// #endif
-				
 				uni.navigateTo({
-					url:`../chooseUser/chooseUser?arr=${items}&type=${type}`
+					url:`../chooseUser/chooseUser?arr=${items}&prop=${JSON.stringify(prop)}`
 				})
 			},
 			clear(){
-				this.query=[];
+				this.selectListItem=[];
 				this.isChoose=[]
 			}
 		}

@@ -1,4 +1,4 @@
-	import search from './components/search/index.vue'
+import search from './components/search/index.vue'
 	export default {
 		name: "tree",
 		props: {
@@ -15,13 +15,13 @@
 					return false
 				}
 			},
-			parent:{
+			parent: {
 				type: Boolean,
 				default: () => {
 					return false
 				}
 			},
-			max:{
+			max: {
 				type: Number,
 				default: () => {
 					return '-1'
@@ -46,20 +46,21 @@
 						label: 'name',
 						children: 'children',
 						multiple: false,
-						checkStrictly: false,//不关联
+						checkStrictly: false, //不关联
 					}
 				}
 			}
 		},
 		data() {
 			return {
+				currentIndex: 0, //第几层
 				isre: false,
-				tree: this.trees,
+				tree: Object.freeze(this.trees),
 				newNum: 0,
 				oldNum: 0,
-				allData: this.trees,
+				allData: Object.freeze(this.trees),
 				tree_stack: [1],
-				parent_data: this.parentList||[],//选择父辈
+				parent_data: this.parentList || [], //选择父辈
 				searchResult: [],
 				tochild: false,
 				newCheckList: this.checkList,
@@ -68,114 +69,134 @@
 			}
 		},
 		/*
-			*	已兼容h5和小程序端,其它端没测试过，估计问题不大，只需要改一下传值的方式
-			* 
-			*	如有问题可以加qq：122720267
-			* 	
-			*	使用该插件的朋友请给个好评，或者到git start一下
-			*   git地址：https://github.com/LSZ579/xiaolu-tree-plugin.git
-			*   插件市场地址： https://ext.dcloud.net.cn/plugin?id=2423
-			* 
-		*/
+		 *	已兼容h5和小程序端,其它端没测试过，估计问题不大，只需要改一下传值的方式
+		 * 
+		 *	如有问题可以加qq：122720267
+		 * 	
+		 *	使用该插件的朋友请给个好评，或者到git start一下
+		 *   git地址：https://github.com/LSZ579/xiaolu-tree-plugin.git
+		 *   插件市场地址： https://ext.dcloud.net.cn/plugin?id=2423
+		 * 
+		 */
 		components: {
 			search
 		},
-		mounted() {
-			if(this.props.multiple&&this.props.checkStrictly){
-				if(this.newCheckList.length!=0){
-					 this.checkAllChoose();
-					 return
+		computed: {
+			isSelect() {
+				return (item)=> {
+					const i = this.newCheckList.findIndex(e => {
+						return item.id == e.id
+					}) > -1
+					return i && !item.qx
 				}
-				for(let i = 0; i<this.tree.length;i++){
-					this.$set(this.tree[i],'bx',0)
-					this.$set(this.tree[i],'qx',0)
+
+			},
+			radioSelect(){
+				return (item)=>{
+					return this.newCheckList.length>0&&item.id == this.newCheckList[0].id
 				}
 			}
-			if(!this.props.multiple&&this.newCheckList.length>0) {
-				this.getNodeRoute(this.allData,this.newCheckList[0].id)
+		},
+		mounted() {
+			if (this.props.multiple && this.props.checkStrictly) {
+				if (this.newCheckList.length != 0) {
+					this.checkAllChoose();
+					return
+				}
+			}
+			if (!this.props.multiple && this.newCheckList.length > 0) {
+				this.getNodeRoute(this.allData, this.newCheckList[0].id)
 				let arr = this.nodePathArray.reverse()
-				if(arr.length == 0)return
+				if (arr.length == 0) return
 				this.tree_stack = this.tree_stack.concat(arr);
-				this.tree = this.tree_stack[this.tree_stack.length-1].children;
+				this.tree = this.tree_stack[this.tree_stack.length - 1].children;
 			}
 		},
 		methods: {
+			handleClick(item, index) {
+				let children = item[this.props.children]
+				if (index > -1 && children && children.length > 0) {
+					this.toChildren(item)
+					return
+				}
+				if (this.props.multiple) {
+					this.checkboxChange(item, index, item.bx, item.qx)
+				} else {
+					this.checkbox(item, index)
+				}
+			},
 			//多选
 			async checkboxChange(item, index, bx, qx) {
 				var that = this;
-				if(!this.props.multiple) return;
-				let findIdex = that.newCheckList.findIndex(e=>{return item.id==e.id});
-				if (findIdex>-1) { //反选
-					if (that.props.checkStrictly) {//关联子级
-						if (item.user) {//用户
-							that.newCheckList.splice(findIdex,1) 
-						} else {//非用户，取消所有下一级
+				if (!this.props.multiple) return;
+				let findIdex = that.newCheckList.findIndex(e => {
+					return item.id == e.id
+				});
+				if (findIdex > -1) { //反选
+					if (that.props.checkStrictly) { //关联子级
+						if (item.user) { //用户
+							that.newCheckList.splice(findIdex, 1)
+						} else { //非用户，取消所有下一级
 							that.getIdBydelete(item.children)
 						}
 					} else {
-						that.newCheckList.splice(findIdex,1) 
+						that.newCheckList.splice(findIdex, 1)
 					}
 				} else { //选中
-					if (!item.user&&that.props.checkStrictly) {//选中下一级
-						if(qx||bx){//取消下级
+					if (!item.user && that.props.checkStrictly) { //选中下一级
+						if (qx || bx) { //取消下级
 							await that.getIdBydelete(item.children);
-							item.qx = 0;item.bx = 0;
+							item.qx = 0;
+							item.bx = 0;
+						} else {
+							item.qx = 1;
+							item.bx = 0;
+							await that.chooseChild(item.children, item.id);
 						}
-						else{
-							item.qx = 1;item.bx = 0;
-							await that.chooseChild(item.children,item.id);
-						}
-						that.$emit('sendValue', that.newCheckList);
+						// that.$emit('sendValue', that.newCheckList);
 						that.$forceUpdate()
 						return
 					}
-					// if(item.user&&this.props.checkStrictly) this.getNodeRoute(this.allData,item.id);
-					that.newCheckList.push({...item});
+					that.newCheckList.push({ ...item
+					});
 				}
-				that.$emit('sendValue', that.newCheckList)
+				// that.$emit('sendValue', that.newCheckList)
 			},
 			// 取消下一级的选中
 			getIdBydelete(arr) {
-				arr.forEach(e=>{
-					if(e.user){
-						for(var i = 0; i<this.newCheckList.length;i++){
-							if(e.id == this.newCheckList[i].id) {
-								this.newCheckList.splice(i,1)
+				arr.forEach(e => {
+					if (e.user) {
+						for (var i = 0; i < this.newCheckList.length; i++) {
+							if (e.id == this.newCheckList[i].id) {
+								this.newCheckList.splice(i, 1)
 								break;
 							}
 						}
 					}
-					if(!e.user){
+					if (!e.user) {
 						this.getIdBydelete(e.children)
 					}
 				})
 			},
-			//取消父级
-			// deleteParent(id){
-			// 	for(var i = 0; i<this.parent_data.length;i++){
-			// 		if(id == this.parent_data[i].id) {
-			// 			this.parent_data.splice(i,1)
-			// 			break;
-			// 		}
-			// 	}
-			// },
-			
+
 			// 关联下一级,选中
-			chooseChild(arr,pid) {
+			chooseChild(arr, pid) {
 				let that = this;
 				for (var i = 0, len = arr.length; i < len; i++) {
 					let item = arr[i];
-					if(item.user) {
-						that.newCheckList.push({...item,tree_stackId:pid})
+					if (item.user) {
+						that.newCheckList.push({ ...item,
+							tree_stackId: pid
+						})
 					}
 					if (!item.user) {
-						this.chooseChild(item.children,item.id)
+						this.chooseChild(item.children, item.id)
 					}
 				}
 			},
-			
+
 			// (tree为目标树，targetId为目标节点id) 
-			 getNodeRoute(tree, targetId) {
+			getNodeRoute(tree, targetId) {
 				for (let index = 0; index < tree.length; index++) {
 					if (tree[index].children) {
 						let endRecursiveLoop = this.getNodeRoute(tree[index].children, targetId)
@@ -189,32 +210,29 @@
 					}
 				}
 			},
-			
+
 			//单选
 			checkbox(item, index) {
 				var that = this;
-				that.newCheckList = []
-				that.newCheckList.push(that.tree[index])
-				that.$emit('sendValue', that.newCheckList)
+				that.$set(this, 'newCheckList', [item])
 			},
 			//到下一级
-			 toChildren(item) {
-				 console.log(this.tree_stack)
-				if(item.user) return
+			toChildren(item) {
+				console.log(this.tree_stack)
+				if (item.user) return
 				var that = this;
 				this.tochild = true;
 				let children = that.props.children;
 				if (!item.user && item[children].length > 0) {
 					that.tree = item[children];
-					if (that.tree_stack[0].id == item.id) {
-					} else {
+					if (that.tree_stack[0].id == item.id) {} else {
 						that.tree_stack.push(item);
 					}
 				}
 				this.$nextTick(() => {
 					this.scrollLeft += 200;
 				})
-				if(this.props.checkStrictly) this.checkAllChoose();
+				if (this.props.checkStrictly) this.checkAllChoose();
 				this.$forceUpdate()
 			},
 			//搜索
@@ -222,7 +240,7 @@
 				this.searchResult = []
 				this.search(this.allData, val)
 				this.isre = true
-				this.tree_stack.splice(1, 6666)
+				this.tree_stack.splice(1, 1000)
 				uni.showLoading({
 					title: '正在查找'
 				})
@@ -243,55 +261,62 @@
 					}
 				}
 			},
-			
-			 checkAllChoose(){
-				 let o = false,t = true;
-				this.tree.forEach((e,i)=>{
-					if(!e.user){
+
+			checkAllChoose() {
+				let o = false,
+					t = true;
+				this.tree.forEach((e, i) => {
+					if (!e.user) {
 						e.qx = o;
 						e.bx = o;
 						let num2 = this.computAllNumber(e.children);
 						// console.log(this.newNum,this.oldNum)
-						if(this.newNum!=0&&this.oldNum!=0){
-							if(this.newNum==this.oldNum) {
-								e.qx = t;e.bx = o;
-							}else{
-								e.qx = o;e.bx = t;
+						if (this.newNum != 0 && this.oldNum != 0) {
+							if (this.newNum == this.oldNum) {
+								e.qx = t;
+								e.bx = o;
+							} else {
+								e.qx = o;
+								e.bx = t;
 							}
 						}
-						if(this.newNum!=0&&this.oldNum == 0){
-							this.$set(this.tree[i],'bx',o); this.$set(this.tree[i],'qx',o);
+						if (this.newNum != 0 && this.oldNum == 0) {
+							this.$set(this.tree[i], 'bx', o);
+							this.$set(this.tree[i], 'qx', o);
 						}
 						this.$forceUpdate()
-						this.newNum=0
-						this.oldNum=0
+						this.newNum = 0
+						this.oldNum = 0
 					}
 				})
 			},
 
 			computAllNumber(arr) {
-				for(let j = 0; j<arr.length;j++){
+				for (let j = 0; j < arr.length; j++) {
 					var e = arr[j];
-					if(arr[j].user) {this.newNum ++;}
+					if (arr[j].user) {
+						this.newNum++;
+					}
 					this.checkSum(e.id)
-					if(!e.user){
+					if (!e.user) {
 						this.computAllNumber(e.children)
 					}
 				}
 			},
-			
-			checkSum(id){
-				for(let i = 0; i<this.newCheckList.length;i++){
-					if(id == this.newCheckList[i].id) {
+
+			checkSum(id) {
+				for (let i = 0; i < this.newCheckList.length; i++) {
+					if (id == this.newCheckList[i].id) {
 						this.oldNum++;
 						break
 					}
 				}
 			},
-			
+
 			//返回其它层
 			backTree(item, index) {
-				let that = this,max = 66666;
+				let that = this,
+					max = 10000;
 				if (index == -1) {
 					that.tree = that.allData
 					that.tree_stack.splice(1, max)
@@ -308,17 +333,17 @@
 							}
 						})
 					} else if (index == that.tree_stack.length - 1) {
-						
+
 					} else {
 						that.tree_stack.splice(that.tree_stack.length - 1, 1)
 					}
 					that.tree = item[that.props.children]
 				}
-				if(this.props.checkStrictly) this.checkAllChoose();
+				if (this.props.checkStrictly) this.checkAllChoose();
 				this.$forceUpdate()
 			},
-			backConfirm(){
-				this.$emit('sendValue',this.newCheckList,'back')
+			backConfirm() {
+				this.$emit('sendValue', this.newCheckList, 'back')
 			}
 
 		}

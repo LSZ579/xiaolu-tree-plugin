@@ -62,7 +62,13 @@
 				padding: 15rpx 0;
 				position: relative;
 				font-size: 32rpx;
-				
+				.lable-text{
+					margin-left: 16rpx;
+					font-size: 30rpx;
+					color: #5b5757;
+					width: 500rpx;
+					word-break: break-all;
+				}
 				.right {
 					position: absolute;
 					right: 30rpx;
