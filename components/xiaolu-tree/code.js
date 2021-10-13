@@ -57,6 +57,7 @@ export default {
 		this.Init()
 	},
 	methods: {
+		// 初始化
 		Init() {
 			if (this.newCheckList.length !== 0) {
 				let {
@@ -79,6 +80,7 @@ export default {
 				}
 			}
 		},
+		// 点击项目处理
 		handleClick(item, index) {
 			let children = item[this.props.children]
 			if (index > -1 && children && children.length > 0) {
@@ -89,6 +91,7 @@ export default {
 				this.checkbox(item, index)
 			}
 		},
+		// 获取路径
 		getPath() {
 			const {
 				keyCode,

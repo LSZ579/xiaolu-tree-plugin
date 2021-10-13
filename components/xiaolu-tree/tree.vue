@@ -39,12 +39,12 @@
 							</view>
 							<!-- 单选 -->
 							<view class="checkbox" v-else-if="(props.nodes?item.user?true:false:true)" @click.stop="handleClick(item,-1)">
-								<i v-show="radioSelect(item)" class="txt iconfont icon-selected" />
-								<i style="color: #b8b8b8;" v-show="!radioSelect(item)" class="txt iconfont icon-weixuanzhong1" />
+								<i v-if="radioSelect(item)" class="txt iconfont icon-selected" />
+								<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1" />
 							</view>
 						</view>
 						<view class="lable-text">{{item[props.label]}}</view>
-						<view class="right"><i v-show="!item.user&&item.children.length>0" class="iconfont icon-z043 iconclass"></i></view>
+						<view class="right"><i v-if="!item.user&&item.children.length>0" class="iconfont icon-z043 iconclass"></i></view>
 					</label>
 				</view>
 			</view>
