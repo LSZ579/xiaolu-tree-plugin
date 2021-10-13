@@ -19,7 +19,6 @@ export default {
 			oldNum: 0,
 			catchTreeNone: [...this.treeNone],
 			tree_stack: [1],
-
 			searchResult: [],
 			newCheckList: this.checkList,
 			scrollLeft: 999,
@@ -265,7 +264,7 @@ export default {
 				if (!e.user) {
 					e.qx = o;
 					e.bx = o;
-					let num2 = this.computAllNumber(e.children);
+					 this.computAllNumber(e.children);
 					// console.log(this.newNum,this.oldNum)
 					if (this.newNum != 0 && this.oldNum != 0) {
 						if (this.newNum == this.oldNum) {

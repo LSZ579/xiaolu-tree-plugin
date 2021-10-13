@@ -64,14 +64,8 @@
 			uni.$on('selectSuccess',(data)=>{
 				this.$set(this,'selectListItem',[...data.list])
 			})
-			this.getTree()
 		},
 		methods: {
-			getTree(){
-				uni.request({
-					url:'https://lsz520.xyz/avatarPhp/public/index.php/api/v1/tree'
-				})
-			},
 			toChoose(prop){
 				// #ifdef H5
 					let items = encodeURIComponent(JSON.stringify(this.selectListItem));
