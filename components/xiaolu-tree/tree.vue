@@ -30,11 +30,11 @@
 							<!-- 多选 -->
 							<view class="checkbox" v-if="props.multiple" @click.stop="handleClick(item,-1)">
 								<span v-if="isSelect(item)">
-									<i v-if="item.bx&&props.multiple" class="iconfont icon-banxuanzhongshousuo1-shi icons" />
+									<i v-if="item.bx&&newCheckList.length!=0" class="iconfont icon-banxuanzhongshousuo1-shi icons" />
 									<i v-else class="iconfont icon-xuanzhong txt icon-selected" />
 								</span>
-								<i v-else-if="props.multiple&&item.qx" class="iconfont icon-xuanzhong txt icon-selected" />
-								<i v-else-if="item.bx&&props.multiple" class="iconfont icon-banxuanzhongshousuo1-shi icons" />
+								<i v-else-if="item.qx" class="iconfont icon-xuanzhong txt icon-selected" />
+								<i v-else-if="item.bx" class="iconfont icon-banxuanzhongshousuo1-shi icons" />
 								<i style="color: #b8b8b8;" v-else class="iconfont icon-weixuanzhong txt" />
 							</view>
 							<!-- 单选 -->
@@ -44,7 +44,7 @@
 							</view>
 						</view>
 						<view class="lable-text">{{item[props.label]}}</view>
-						<view class="right"><i v-show="!item.user&&item.children.length>0" class="iconfont icon-z043"></i></view>
+						<view class="right"><i v-show="!item.user&&item.children.length>0" class="iconfont icon-z043 iconclass"></i></view>
 					</label>
 				</view>
 			</view>

@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "chooseUser-xiaolu-tree-default": "/pages/chooseUser/chooseUser-xiaolu-tree-default",
-    "xiaolu-tree": "/components/xiaolu-tree/tree"
-  }
-}

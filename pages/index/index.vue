@@ -1,22 +1,20 @@
 <template>
 	<view>
-		<view class="children">
-			<view v-for="(item,index) in selectListItem" style="margin: 2px;display: inline-block;" :key="index">
-				<text >{{item.name}};</text>
-			</view>
-		</view>
-		
-		<view class="parent">
-			<view v-for="(item,index) in parent_list" style="margin: 2px;display: inline-block;" :key="index">
-				<text >{{item.name}};</text>
-			</view>
-		</view>
-		
 		<button class="btn" @click="toChoose(aprop)" type="primary">多选模式（选择任意一项）</button>
 		<button  class="btn" @click="toChoose(bprop)" type="primary">多选模式（关联下级）</button>
 		<button class="btn" @click="toChoose(cprop)" type="primary">单选模式(任意一项)</button>
 		<button class="btn" @click="toChoose(dprop)" type="primary">单选（只选user）</button>
 		<button class="btn" @click="clear()" type="default">清空选择</button>
+		<view class="children">
+			<view v-for="(item,index) in selectListItem" style="margin: 2px;display: inline-block;font-size: 26rpx;" :key="index">
+					<view>名字：{{item.name}};&nbsp;</view>
+					路径：
+					<view v-for="(row,k) in item.path" style="display: inline-block;font-size: 24rpx;" :key="k">
+						{{row.name}}-
+					</view>
+					<view>--------</view>
+			</view>
+		</view>
 	</view>
 	
 </template>
@@ -37,9 +35,6 @@
 		data() {
 			return {
 				selectListItem:[],
-				parent_list: [],
-
-				isChoose:[],
 				aprop: {
 					label: 'name',
 					children: 'children',
@@ -69,8 +64,14 @@
 			uni.$on('selectSuccess',(data)=>{
 				this.$set(this,'selectListItem',[...data.list])
 			})
+			this.getTree()
 		},
 		methods: {
+			getTree(){
+				uni.request({
+					url:'https://lsz520.xyz/avatarPhp/public/index.php/api/v1/tree'
+				})
+			},
 			toChoose(prop){
 				// #ifdef H5
 					let items = encodeURIComponent(JSON.stringify(this.selectListItem));
@@ -84,7 +85,6 @@
 			},
 			clear(){
 				this.selectListItem=[];
-				this.isChoose=[]
 			}
 		}
 	}
@@ -94,14 +94,11 @@
 	.children{
 		color: #BBB2B2;
 	}
-	.parent{
-		margin-top: 30px;
+	.color{
+		color: #bbb2b2;
 	}
-.color{
-	color: #bbb2b2;
-}
-.btn{
-	margin: 10px auto;
-}
+	.btn{
+		margin: 10px auto;
+	}
 
 </style>

@@ -1,13 +1,14 @@
 <template>
 	<view>
-		<xiaolu-tree  v-slot:default="{item}" :checkList="checkList"  v-if="tree.length>0" :max="max" :props="prop" @sendValue="confirm"  :parent="true" :isCheck="true" :trees="tree"></xiaolu-tree>
+		<xiaolu-tree  :checkList="checkList"  v-if="tree.length>0"  :props="prop" @sendValue="confirm"  :isCheck="true" :treeNone="tree"></xiaolu-tree>
 		
 	</view>
 </template>
 
 <script>
 	import XiaoluTree from '@/components/xiaolu-tree/tree.vue';
-	import dataList from './data.js'
+	import {treeNode} from './data.js'
+
 	export default {
 		components: {
 			XiaoluTree
@@ -31,7 +32,7 @@
 			// #endif
 			this.prop = JSON.parse(prop)
 			this.checkList = checkList;
-			this.tree=dataList;//树形数据赋值
+			this.tree=treeNode;//树形数据赋值
 		},
 		methods: {
 			//获取选中的值

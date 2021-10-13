@@ -62,5 +62,5 @@
 			}
 		}
 	}
-	@import url("../../css/icon.css");
+	@import url("../css/icon.css");
 </style>
