@@ -311,22 +311,18 @@ export default {
 		backTree(item, index) {
 			let that = this,
 				tree_stack = that.tree_stack,
-				max = 1000;
+				max = 300;
 			if (index === -1) {
 				that.tree = that.catchTreeNone
 				that.tree_stack.splice(1, max)
 				that.isre = false
 				that.$refs.sea.clears()
-			} else if (index === -2) {
+			} else if (index === -2) {//搜索
 				that.tree = that.searchResult
 				that.tree_stack.splice(1, max)
 			} else {
 				if (tree_stack.length - index > 2) {
-					tree_stack.forEach((item, i) => {
-						if (i > index) {
-							that.tree_stack.splice(i, max)
-						}
-					})
+					that.tree_stack.splice(index+1, max)
 				} else if (index !== tree_stack.length - 1) {
 					that.tree_stack.splice(tree_stack.length - 1, 1)
 				}
