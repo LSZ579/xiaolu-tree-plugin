@@ -245,10 +245,10 @@ export default {
 			}, 300)
 		},
 		search(data, keyword) {
-			var that = this
-			let children = that.props.children
+			let that = this
+			let {label,children} = that.props
 			for (var i = 0, len = data.length; i < len; i++) {
-				if (data[i].name.indexOf(keyword) >= 0) {
+				if (data[i][label].indexOf(keyword) >= 0) {
 					that.searchResult.push(data[i])
 				}
 				if (!data[i].user && data[i][children].length > 0) {
@@ -311,7 +311,7 @@ export default {
 		backTree(item, index) {
 			let that = this,
 				tree_stack = that.tree_stack,
-				max = 10000;
+				max = 1000;
 			if (index === -1) {
 				that.tree = that.catchTreeNone
 				that.tree_stack.splice(1, max)
