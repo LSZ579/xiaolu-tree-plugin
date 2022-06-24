@@ -50,6 +50,11 @@ export default {
 		},
 		keyCode() {
 			return this.keyValue
+		},
+		isActive(){
+			return (index)=>{
+				return index===this.tree_stack.length-1
+			}
 		}
 	},
 	created() {

@@ -1,4 +1,5 @@
 # xiaolu-tree-plugin
+在线预览地址：https://lsz579.github.io/xiaolu-tree-plugin/#/
 无限极树形结构选择器，树形选择器增强版，支持多选、单选、父级选择，单选支持查找路径
 
 ## 文档地址

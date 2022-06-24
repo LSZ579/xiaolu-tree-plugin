@@ -6,15 +6,15 @@
 				<scroll-view scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
 					<view v-for="(item,index) in tree_stack" class="inline-item" :key="index">
 						<view class="inline-item" v-if="index==0" @click="backTree(item,-1)">
-							<text :class="[(index==tree_stack.length-1&&!isre)?'none':'active']">全部</text>
+							<text :class="[(isActive(index)&&!isre)?'none':'active']">全部</text>
 						</view>
-						<view v-if="index==0&&isre" @click="backTree(item,-2)" :class="[index==tree_stack.length-1&&isre]?'none inline-item':'active inline-item'">
+						<view v-if="index==0&&isre" @click="backTree(item,-2)" :class="[(index==tree_stack.length-1&&isre)?'none':'active','inline-item']">
 							<i class="iconfont icon-z043 iconclass" />
 							搜索结果
 						</view>
 						<view class="inline-item" @click="backTree(item,index)" v-if="index!=0">
 							<i class="iconfont icon-z043 iconclass" />
-							<text :class="index==tree_stack.length-1?'none inline-ite':'active'">
+							<text :class="isActive(index)?'none inline-ite':'active'">
 								{{item[props.label]}}
 							</text>
 						</view>
