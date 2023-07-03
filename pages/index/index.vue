@@ -38,25 +38,29 @@
 				aprop: {
 					label: 'name',
 					children: 'children',
-					multiple:true
+					multiple:true,
+					hasPath:true
 				},
 				bprop: {
 					label: 'name',
 					children: 'children',
 					multiple:true,
-					checkStrictly:true
+					checkStrictly:true,
+					hasPath:true
 				},
 				cprop: {//单选模式(任意一项)
 					label: 'name',
 					children: 'children',
 					multiple:false,
-					nodes:false
+					nodes:false,
+					hasPath:true
 				},
 				dprop: {//单选模式选user
 					label: 'name',
 					children: 'children',
 					multiple:false,
-					nodes:true
+					nodes:true,
+					hasPath:true
 				}
 			}
 		},

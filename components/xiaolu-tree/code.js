@@ -95,13 +95,36 @@ export default {
 				this.checkbox(item, index)
 			}
 		},
+		// (tree为目标树，targetId为目标节点id)
+		getNodeRoutePath(tree, targetId, nodePathArray = []) {
+			for (let index = 0; index < tree.length; index++) {
+				if (tree[index].children) {
+					let endRecursiveLoop = this.getNodeRoutePath(tree[index].children, targetId,nodePathArray)
+					if (endRecursiveLoop) {
+						nodePathArray.push(tree[index])
+						return true
+					}
+				}
+				if (tree[index][this.keyCode] === targetId) {
+					return true
+				}
+			}
+		},
 		// 获取路径
-		getPath() {
+		getPath(id) {
+			if(!this.props.hasPath) return '';
 			const {
 				keyCode,
 				tree_stack,
 				props
 			} = this
+			if(this.isre){
+				// 搜索情况下，无法获取完整的路径，如果需要获取，则只能通过完整的树去查找
+				let path = []
+				this.getNodeRoutePath(this.catchTreeNone,id,path)
+				console.log(path)
+				return path.reverse();
+			}
 			const path = [...tree_stack].map(e => {
 				const item = Object.assign({}, e)
 				delete item[props.children]
@@ -117,7 +140,7 @@ export default {
 			} = that
 			if (!props.multiple) return;
 			let findIdex = that.newCheckList.findIndex(e => item[this.keyCode] == e[this.keyCode]);
-			const path = this.getPath()
+			const path = this.getPath(item[this.keyValue])
 			if (findIdex > -1) { //反选
 				if (props.checkStrictly) { //关联子级
 					if (item.user) { //用户
@@ -209,10 +232,10 @@ export default {
 				}
 			}
 		},
-
+		
 		//单选
 		checkbox(item, index) {
-			const path = this.getPath()
+			const path = this.getPath(item[this.keyValue])
 			this.$set(this, 'newCheckList', [{ ...item,
 				path
 			}])
@@ -379,6 +402,7 @@ export default {
 					children: 'children',
 					multiple: false,
 					checkStrictly: false, //不关联
+					hasPath:false,//返回值是否都带路径
 				}
 			}
 		}
