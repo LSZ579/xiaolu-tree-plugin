@@ -70,18 +70,16 @@ export default {
 					catchTreeNone,
 					newCheckList
 				} = this
-				if (props.multiple) {
-					if (props.checkStrictly) {
-						this.checkAllChoose();
-					}
-				} else {
-					this.getNodeRoute(catchTreeNone, newCheckList[0][this.keyCode])
-					let arr = this.nodePathArray.reverse()
-					console.log(arr)
-					if (arr.length == 0) return
-					this.tree_stack = tree_stack.concat(arr);
-					this.tree = this.tree_stack[this.tree_stack.length - 1].children;
-				}
+				let index = 0
+				let flag = props.multiple &&  props.checkStrictly
+				flag && (index = newCheckList.length - 1)
+				this.getNodeRoute(catchTreeNone, newCheckList[index][this.keyCode])
+				let arr = this.nodePathArray.reverse()
+				console.log(arr)
+				if (arr.length == 0) return
+				this.tree_stack = tree_stack.concat(arr);
+				this.tree = this.tree_stack[this.tree_stack.length - 1].children;
+				flag && this.checkAllChoose();
 			}
 		},
 		// 点击项目处理
