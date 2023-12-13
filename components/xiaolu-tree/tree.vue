@@ -44,7 +44,7 @@
 							</view>
 						</view>
 						<view class="lable-text">{{item[props.label]}}</view>
-						<view class="right"><i v-if="!item.user&&item.children.length>0" class="iconfont icon-z043 iconclass"></i></view>
+						<view class="right"><i v-if="!item.user&&item[props.children].length>0" class="iconfont icon-z043 iconclass"></i></view>
 					</label>
 				</view>
 			</view>

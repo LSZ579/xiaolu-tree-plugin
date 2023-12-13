@@ -31,6 +31,7 @@
 			let checkList = JSON.parse(arr);
 			// #endif
 			this.prop = JSON.parse(prop)
+			console.log(this.prop)
 			this.checkList = checkList;
 			this.tree=treeNode;//树形数据赋值
 		},

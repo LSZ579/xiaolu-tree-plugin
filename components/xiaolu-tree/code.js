@@ -75,10 +75,9 @@ export default {
 				flag && (index = newCheckList.length - 1)
 				this.getNodeRoute(catchTreeNone, newCheckList[index][this.keyCode])
 				let arr = this.nodePathArray.reverse()
-				console.log(arr)
 				if (arr.length == 0) return
 				this.tree_stack = tree_stack.concat(arr);
-				this.tree = this.tree_stack[this.tree_stack.length - 1].children;
+				this.tree = this.tree_stack[this.tree_stack.length - 1][this.props.children];
 				flag && this.checkAllChoose();
 			}
 		},
@@ -96,8 +95,8 @@ export default {
 		// (tree为目标树，targetId为目标节点id)
 		getNodeRoutePath(tree, targetId, nodePathArray = []) {
 			for (let index = 0; index < tree.length; index++) {
-				if (tree[index].children) {
-					let endRecursiveLoop = this.getNodeRoutePath(tree[index].children, targetId,nodePathArray)
+				if (tree[index][this.props.children]) {
+					let endRecursiveLoop = this.getNodeRoutePath(tree[index][this.props.children], targetId,nodePathArray)
 					if (endRecursiveLoop) {
 						nodePathArray.push(tree[index])
 						return true
@@ -125,7 +124,7 @@ export default {
 			}
 			const path = [...tree_stack].map(e => {
 				const item = Object.assign({}, e)
-				delete item[props.children]
+				delete item[props.child]
 				return item
 			})
 			return path.slice(1, path.length) || []
@@ -144,7 +143,7 @@ export default {
 					if (item.user) { //用户
 						that.newCheckList.splice(findIdex, 1)
 					} else { //非用户，取消所有下一级
-						that.getIdBydelete(item.children)
+						that.getIdBydelete(item[this.props.children])
 					}
 				} else {
 					that.newCheckList.splice(findIdex, 1)
@@ -152,7 +151,7 @@ export default {
 			} else { //选中
 				if (!item.user && props.checkStrictly) { //选中下一级
 					if (qx || bx) { //取消下级
-						await that.getIdBydelete(item.children);
+						await that.getIdBydelete(item[this.props.children]);
 						item.qx = 0;
 						item.bx = 0;
 					} else {
@@ -169,7 +168,7 @@ export default {
 							user
 						}
 						const pathList = this.tree_stack.length === 1 ? [newObj, ...path] : [...path, newObj]
-						await that.chooseChild(item.children, pathList);
+						await that.chooseChild(item[this.props.children], pathList);
 					}
 					this.$forceUpdate()
 					return
@@ -190,7 +189,7 @@ export default {
 						}
 					}
 				} else {
-					this.getIdBydelete(e.children)
+					this.getIdBydelete(e[this.props.children])
 				}
 			})
 		},
@@ -210,7 +209,7 @@ export default {
 					}
 					delete newItem[that.props.children]
 					const newPath = [...oldPath, newItem]
-					that.chooseChild(item.children, newPath)
+					that.chooseChild(item[this.props.children], newPath)
 				}
 			}
 		},
@@ -218,8 +217,8 @@ export default {
 		// (tree为目标树，targetId为目标节点id) 
 		getNodeRoute(tree, targetId) {
 			for (let index = 0; index < tree.length; index++) {
-				if (tree[index].children) {
-					let endRecursiveLoop = this.getNodeRoute(tree[index].children, targetId)
+				if (tree[index][this.props.children]) {
+					let endRecursiveLoop = this.getNodeRoute(tree[index][this.props.children], targetId)
 					if (endRecursiveLoop) {
 						this.nodePathArray.push(tree[index])
 						return true
