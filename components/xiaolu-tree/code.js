@@ -1,19 +1,19 @@
 import search from './search/index.vue'
-	/*
-	 *	已兼容h5和小程序端,其它端没测试过，估计问题不大，只需要改一下传值的方式
-	 * 
-	 *	如有问题可以加qq：122720267
-	 * 	
-	 *	使用该插件的朋友请给个好评，或者到git start一下
-	 *   git地址：https://github.com/LSZ579/xiaolu-tree-plugin.git
-	 *   插件市场地址： https://ext.dcloud.net.cn/plugin?id=2423
-	 * 
-	 */
+/*
+ *	已兼容h5和小程序端,其它端没测试过，估计问题不大，只需要改一下传值的方式
+ * 
+ *	如有问题可以加qq：122720267
+ * 	
+ *	使用该插件的朋友请给个好评，或者到git start一下
+ *   git地址：https://github.com/LSZ579/xiaolu-tree-plugin.git
+ *   插件市场地址： https://ext.dcloud.net.cn/plugin?id=2423
+ * 
+ */
 export default {
 	name: "treeComponent",
 	data() {
 		return {
-			isre: false,
+			is_search: false,
 			tree: Object.freeze(this.treeNone),
 			newNum: 0,
 			oldNum: 0,
@@ -36,24 +36,19 @@ export default {
 					this.props.checkStrictly ? (item.bx = 0, item.qx = 0) : ''
 					return false
 				}
-				const i = checkList.findIndex(e => {
-					return item[this.keyCode] == e[this.keyCode]
-				}) > -1
-				return i && !item.qx
+				const select = checkList.some(e => item[this.keyValue] == e[this.keyValue]);
+				return select && !item.qx
 			}
 		},
 		radioSelect() {
 			const list = this.newCheckList
 			return (item) => {
-				return list.length > 0 && item[this.keyCode] == list[0][this.keyCode]
+				return list.length > 0 && item[this.keyValue] == list[0][this.keyValue]
 			}
 		},
-		keyCode() {
-			return this.keyValue
-		},
-		isActive(){
-			return (index)=>{
-				return index===this.tree_stack.length-1
+		isActive() {
+			return (index) => {
+				return index === this.tree_stack.length - 1
 			}
 		}
 	},
@@ -69,11 +64,9 @@ export default {
 					props,
 					catchTreeNone,
 					newCheckList
-				} = this
-				let index = 0
-				let flag = props.multiple &&  props.checkStrictly
-				flag && (index = newCheckList.length - 1)
-				this.getNodeRoute(catchTreeNone, newCheckList[index][this.keyCode])
+				} = this, index = 0, flag = props.multiple && props.checkStrictly;
+				flag && (index = newCheckList.length - 1);
+				this.getNodeRoute(catchTreeNone, newCheckList[index][this.keyValue])
 				let arr = this.nodePathArray.reverse()
 				if (arr.length == 0) return
 				this.tree_stack = tree_stack.concat(arr);
@@ -96,29 +89,30 @@ export default {
 		getNodeRoutePath(tree, targetId, nodePathArray = []) {
 			for (let index = 0; index < tree.length; index++) {
 				if (tree[index][this.props.children]) {
-					let endRecursiveLoop = this.getNodeRoutePath(tree[index][this.props.children], targetId,nodePathArray)
+					let endRecursiveLoop = this.getNodeRoutePath(tree[index][this.props.children], targetId,
+						nodePathArray)
 					if (endRecursiveLoop) {
 						nodePathArray.push(tree[index])
 						return true
 					}
 				}
-				if (tree[index][this.keyCode] === targetId) {
+				if (tree[index][this.keyValue] === targetId) {
 					return true
 				}
 			}
 		},
 		// 获取路径
 		getPath(id) {
-			if(!this.props.hasPath) return '';
+			if (!this.props.hasPath) return '';
 			const {
-				keyCode,
+				keyValue,
 				tree_stack,
 				props
 			} = this
-			if(this.isre){
+			if (this.is_search) {
 				// 搜索情况下，无法获取完整的路径，如果需要获取，则只能通过完整的树去查找
 				let path = []
-				this.getNodeRoutePath(this.catchTreeNone,id,path)
+				this.getNodeRoutePath(this.catchTreeNone, id, path)
 				console.log(path)
 				return path.reverse();
 			}
@@ -136,7 +130,7 @@ export default {
 				props
 			} = that
 			if (!props.multiple) return;
-			let findIdex = that.newCheckList.findIndex(e => item[this.keyCode] == e[this.keyCode]);
+			let findIdex = that.newCheckList.findIndex(e => item[this.keyValue] == e[this.keyValue]);
 			const path = this.getPath(item[this.keyValue])
 			if (findIdex > -1) { //反选
 				if (props.checkStrictly) { //关联子级
@@ -152,8 +146,7 @@ export default {
 				if (!item.user && props.checkStrictly) { //选中下一级
 					if (qx || bx) { //取消下级
 						await that.getIdBydelete(item[this.props.children]);
-						item.qx = 0;
-						item.bx = 0;
+						item.qx = item.bx = 0
 					} else {
 						item.qx = 1;
 						item.bx = 0;
@@ -173,7 +166,8 @@ export default {
 					this.$forceUpdate()
 					return
 				}
-				that.newCheckList.push({ ...item,
+				that.newCheckList.push({
+					...item,
 					path
 				});
 			}
@@ -183,7 +177,7 @@ export default {
 			arr.forEach(e => {
 				if (e.user) {
 					for (var i = 0; i < this.newCheckList.length; i++) {
-						if (e[this.keyCode] == this.newCheckList[i][this.keyCode]) {
+						if (e[this.keyValue] == this.newCheckList[i][this.keyValue]) {
 							this.newCheckList.splice(i, 1)
 							break;
 						}
@@ -201,11 +195,13 @@ export default {
 			for (var i = 0, len = arr.length; i < len; i++) {
 				let item = arr[i];
 				if (item.user) {
-					that.newCheckList.push({ ...item,
+					that.newCheckList.push({
+						...item,
 						path: oldPath
 					})
 				} else {
-					const newItem = { ...item
+					const newItem = {
+						...item
 					}
 					delete newItem[that.props.children]
 					const newPath = [...oldPath, newItem]
@@ -224,16 +220,17 @@ export default {
 						return true
 					}
 				}
-				if (tree[index][this.keyCode] === targetId) {
+				if (tree[index][this.keyValue] === targetId) {
 					return true
 				}
 			}
 		},
-		
+
 		//单选
 		checkbox(item, index) {
 			const path = this.getPath(item[this.keyValue])
-			this.$set(this, 'newCheckList', [{ ...item,
+			this.$set(this, 'newCheckList', [{
+				...item,
 				path
 			}])
 		},
@@ -245,7 +242,8 @@ export default {
 				title: '加载中'
 			})
 			let children = that.props.children;
-			if (!item.user && item[children].length > 0 && !(that.tree_stack[0][this.keyCode] == item[this.keyCode])) {
+			if (!item.user && item[children].length > 0 && !(that.tree_stack[0][this.keyValue] == item[this
+					.keyValue])) {
 				that.tree = item[children];
 				that.tree_stack.push(item);
 			}
@@ -259,19 +257,23 @@ export default {
 		confirmSearch(val) {
 			this.searchResult = []
 			this.search(this.catchTreeNone, val)
-			this.isre = true
+			this.is_search = true
 			this.tree_stack.splice(1, 1000)
 			uni.showLoading({
 				title: '正在查找'
 			})
 			setTimeout(() => {
 				this.tree = this.searchResult
+				if (this.props.checkStrictly) this.checkAllChoose();
 				uni.hideLoading()
 			}, 300)
 		},
 		search(data, keyword) {
 			let that = this
-			let {label,children} = that.props
+			let {
+				label,
+				children
+			} = that.props
 			for (var i = 0, len = data.length; i < len; i++) {
 				if (data[i][label].indexOf(keyword) >= 0) {
 					that.searchResult.push(data[i])
@@ -281,40 +283,29 @@ export default {
 				}
 			}
 		},
-
 		checkAllChoose() {
-			let o = false,
-				t = true;
 			this.tree.forEach((e, i) => {
 				if (!e.user) {
-					e.qx = o;
-					e.bx = o;
-					 this.computAllNumber(e.children);
+					e.qx = e.bx = false;
+					this.computAllNumber(e.children);
 					// console.log(this.newNum,this.oldNum)
 					if (this.newNum != 0 && this.oldNum != 0) {
-						if (this.newNum == this.oldNum) {
-							e.qx = t;
-							e.bx = o;
-						} else {
-							e.qx = o;
-							e.bx = t;
-						}
+						e.qx = this.newNum == this.oldNum
+						e.bx = !e.qx
 					}
 					if (this.newNum != 0 && this.oldNum == 0) {
-						this.$set(this.tree[i], 'bx', o);
-						this.$set(this.tree[i], 'qx', o);
+						this.$set(this.tree[i], 'bx', false);
+						this.$set(this.tree[i], 'qx', false);
 					}
 					this.$forceUpdate()
-					this.newNum = 0
-					this.oldNum = 0
+					this.newNum = this.oldNum = 0
 				}
 			})
 		},
-
 		computAllNumber(arr) {
 			for (let j = 0; j < arr.length; j++) {
 				var e = arr[j];
-				this.checkSum(e[this.keyCode])
+				this.checkSum(e[this.keyValue])
 				if (e.user) {
 					this.newNum++;
 				} else {
@@ -322,16 +313,14 @@ export default {
 				}
 			}
 		},
-
 		checkSum(id) {
 			for (let i = 0; i < this.newCheckList.length; i++) {
-				if (id == this.newCheckList[i][this.keyCode]) {
+				if (id == this.newCheckList[i][this.keyValue]) {
 					this.oldNum++;
 					break
 				}
 			}
 		},
-
 		//返回其它层
 		backTree(item, index) {
 			let that = this,
@@ -340,14 +329,14 @@ export default {
 			if (index === -1) {
 				that.tree = that.catchTreeNone
 				that.tree_stack.splice(1, max)
-				that.isre = false
-				that.$refs.sea.clears()
-			} else if (index === -2) {//搜索
+				that.is_search = false
+				that.$refs.sea?.clears()
+			} else if (index === -2) { //搜索
 				that.tree = that.searchResult
 				that.tree_stack.splice(1, max)
 			} else {
 				if (tree_stack.length - index > 2) {
-					that.tree_stack.splice(index+1, max)
+					that.tree_stack.splice(index + 1, max)
 				} else if (index !== tree_stack.length - 1) {
 					that.tree_stack.splice(tree_stack.length - 1, 1)
 				}
@@ -359,9 +348,9 @@ export default {
 		backConfirm() {
 			this.$emit('sendValue', this.newCheckList, 'back')
 		}
-
 	},
 	props: {
+		// 树形数据源
 		treeNone: {
 			type: Array,
 			default: () => {
@@ -375,11 +364,13 @@ export default {
 				return false
 			}
 		},
-		checkList: {
-			type: Array,
-			default: () => []
+		// 弹出模式时需传的列表滚动高度
+		scrollHeight: {
+			type: String,
+			default: '',
 		},
-		parentList: {
+		// 选中的值的 必传[{[keyValue]:value}] 
+		checkList: {
 			type: Array,
 			default: () => []
 		},
@@ -387,6 +378,7 @@ export default {
 			type: Boolean,
 			default: () => true
 		},
+		// 默认key 
 		keyValue: {
 			type: String,
 			default: 'id',
@@ -399,7 +391,7 @@ export default {
 					children: 'children',
 					multiple: false,
 					checkStrictly: false, //不关联
-					hasPath:false,//返回值是否都带路径
+					hasPath: false, //返回值是否都带路径
 				}
 			}
 		}
