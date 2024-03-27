@@ -96,14 +96,9 @@
 				this.$refs.popup?.close()
 			},
 			toChoose(prop) {
-				// #ifdef H5
-				let items = encodeURIComponent(JSON.stringify(this.selectListItem));
-				// #endif
-				// #ifdef MP-QQ||MP-WEIXIN
-				let items = JSON.stringify(this.selectListItem);
-				// #endif
+				wx.setStorageSync('checkList',this.selectListItem)
 				uni.navigateTo({
-					url: `../chooseUser/chooseUser?arr=${items}&prop=${JSON.stringify(prop)}`
+					url: `../chooseUser/chooseUser?prop=${JSON.stringify(prop)}`
 				})
 			},
 			clear() {

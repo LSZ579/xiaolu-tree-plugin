@@ -23,17 +23,9 @@
 			}
 		},
 		 onLoad(option) {
-			 let { prop,arr } = option
-			 // #ifdef H5
-			let checkList = JSON.parse(decodeURIComponent(arr));
-			// #endif
-			// #ifdef MP-QQ||MP-WEIXIN||APP-NVUE||APP-PLUS
-			let checkList = JSON.parse(arr);
-			// #endif
-			this.prop = JSON.parse(prop)
-			console.log(this.prop)
-			this.checkList = checkList;
-			this.tree=treeNode;//树形数据赋值
+			this.prop = JSON.parse(option.prop)
+			this.checkList = uni.getStorageSync('checkList');
+			this.tree = treeNode;//树形数据赋值
 		},
 		methods: {
 			//获取选中的值

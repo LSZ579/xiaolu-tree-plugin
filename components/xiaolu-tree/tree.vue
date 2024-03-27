@@ -42,7 +42,7 @@
 									<i style="color: #b8b8b8;" v-else class="iconfont icon-weixuanzhong txt" />
 								</view>
 								<!-- 单选 -->
-								<view class="checkbox" v-else-if="(props.nodes?item.user?true:false:true)"
+								<view class="checkbox" v-else-if="!props.nodes||(props.nodes&&item.user)"
 									@click.stop="handleClick(item,-1)">
 									<i v-if="radioSelect(item)" class="txt iconfont icon-selected" />
 									<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1" />

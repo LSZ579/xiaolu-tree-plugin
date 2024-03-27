@@ -68,7 +68,7 @@ export default {
 				flag && (index = newCheckList.length - 1);
 				this.getNodeRoute(catchTreeNone, newCheckList[index][this.keyValue])
 				let arr = this.nodePathArray.reverse()
-				if (arr.length == 0) return
+				if (arr.length == 0) return;
 				this.tree_stack = tree_stack.concat(arr);
 				this.tree = this.tree_stack[this.tree_stack.length - 1][this.props.children];
 				flag && this.checkAllChoose();
@@ -142,11 +142,16 @@ export default {
 				} else {
 					that.newCheckList.splice(findIdex, 1)
 				}
+				// if (props.checkStrictly && !item.user) { //关联子级 非用户，取消所有下一级
+				// 	item.qx = item.bx = 0
+				// 	that.getIdBydelete(item[this.props.children])
+				// }
 			} else { //选中
 				if (!item.user && props.checkStrictly) { //选中下一级
 					if (qx || bx) { //取消下级
 						await that.getIdBydelete(item[this.props.children]);
 						item.qx = item.bx = 0
+						that.newCheckList.splice(findIdex, 1)
 					} else {
 						item.qx = 1;
 						item.bx = 0;
@@ -162,6 +167,10 @@ export default {
 						}
 						const pathList = this.tree_stack.length === 1 ? [newObj, ...path] : [...path, newObj]
 						await that.chooseChild(item[this.props.children], pathList);
+						// that.newCheckList.push({
+						// 	...item,
+						// 	paths
+						// });
 					}
 					this.$forceUpdate()
 					return
